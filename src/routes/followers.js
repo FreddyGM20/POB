@@ -39,7 +39,6 @@ router.get("/followers/:id", async (req, res) => {
   if (user.seguidores.length === 0) {
     res.json({ message: "Este usuario no tiene ningun seguidor" })
   } else {
-    console.log(user)
     res.json(`Seguidores de ${user.nombre} (${user.username}): ${user.seguidores}`)
   }
 });
@@ -51,7 +50,6 @@ router.get("/followed/:id", async (req, res) => {
   if (user.seguidos.length === 0) {
     res.json({ message: "Este usuario no tiene ningun seguidor" })
   } else {
-    console.log(user)
     res.json(`Seguidores de ${user.nombre} (${user.username}): ${user.seguidos}`)
   }
 });

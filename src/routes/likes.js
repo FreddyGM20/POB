@@ -10,7 +10,6 @@ const router = express.Router()
 router.post('/likes', async (req, res) => {
     const like = await likesSchema(req.body)
     const pubg = await publicationSchema.findById({ _id: like.publicacion })
-    const us1 = await userSchema.findById({ _id: pubg.autor })
     if ((like.like).toString().length !== 24) {
         res.json("Error de ID like")
     } else {
@@ -32,7 +31,6 @@ router.post('/likes', async (req, res) => {
                     await publicationSchema
                         .updateOne({ _id: like.publicacion }, { $addToSet: { likes: temp } })
 
-                    console.log(pubg.likes.length)
                     await userSchema
                         .updateOne({ _id: pubg.autor }, {
                             $set: {
@@ -104,7 +102,6 @@ router.delete("/likes/:id/:publicacion", async (req, res) => {
             if (pubg == null || pubg == undefined) {
                 res.json({ message: "El ID del like no existe" })
             } else {
-                    console.log(like)
                     await userSchema
                         .updateOne({ _id: pubg.autor }, {
                             $set: {
@@ -118,21 +115,13 @@ router.delete("/likes/:id/:publicacion", async (req, res) => {
                         })
 
                     await userSchema
-                        .updateOne({ _id: id.id }, {
-                            $pull: {
-                                'likeados': {
-                                    _id: like.publicacion
-                                }
-                            }
-                        })
+                        .updateOne({ _id: id.id }, {$pull: {'likeados': {_id: id.publicacion}}})
 
                     await publicationSchema
-                        .updateOne({ _id: pub }, {
-                            $pull: { likes: { likes: like.like } }
-                        })
+                        .updateOne({ _id: id.publicacion }, {$pullAll: { likes: [id.id] }})
 
-                    await like
-                        .remove({ like: like._id , publicacion:})
+                    await likesSchema
+                        .remove({ like: id.id , publicacion:id.publicacion})
                         .then((data) => res.json(data))
                         .catch((error) => res.json({ message: error }));
             }
