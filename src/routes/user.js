@@ -40,9 +40,9 @@ router.get("/users", (req, res) => {
   // Actualizar información de un usuario
   router.put("/users/:id", (req, res) => {
     const { id } = req.params;
-    const { nombre, dia, mes, año, email, contraseña } = req.body;
+    const { nombre, username, fechanac, email, contraseña } = req.body;
     userSchema
-      .updateOne({ _id: id }, { $set: { nombre, dia, mes, año, email, contraseña} })
+      .updateOne({ _id: id }, { $set: { nombre, username,fechanac, email, contraseña} })
       .then((data) => res.json(data))
       .catch((error) => res.json({ message: error }));
   });
