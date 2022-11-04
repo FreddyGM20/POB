@@ -1,4 +1,5 @@
 const express = require("express")
+const { default: mongoose } = require("mongoose")
 const publicationSchema = require("../models/publication")
 const userSchema = require("../models/user")
 
@@ -27,7 +28,7 @@ router.post('/publication', async (req, res) => {
           }
         }
       })
-    
+
   }
 })
 // Obtener todos los usuarios
@@ -69,20 +70,20 @@ router.delete("/publication/:id", async (req, res) => {
     } else {
       const user = await userSchema.find(pubg.autor)
       await userSchema
-      .updateOne({ _id: pubg.autor }, {
-        $pull: {
-          'publicaciones': {
-            _id: id
+        .updateOne({ _id: pubg.autor }, {
+          $pull: {
+            'publicaciones': {
+              _id: id
+            }
           }
-        }
-      })
+        })
       await publicationSchema
-      .remove({ _id: id })
-      .then((data) => res.json(data))
-      .catch((error) => res.json({ message: error }));
+        .remove({ _id: id })
+        .then((data) => res.json(data))
+        .catch((error) => res.json({ message: error }));
     }
   }
- 
+
 });
 
 // Actualizar información de una publicacion
@@ -96,25 +97,19 @@ router.put("/publication/:id", async (req, res) => {
     if (pubg == null || pubg == undefined) {
       res.json({ message: "El ID de la publicacion no existe" })
     } else {
-      const user = await userSchema.find(pubg.autor)
-      await userSchema
-      .updateOne({ _id: pubg.autor }, {
-        $set: {
-          'publicaciones': {
-            _id: id,
-            publicacion: publicacion,
-            fecharea:pubg.fecharea,
-            likes:pubg.likes
-          }
-        }
-      })
+        await userSchema
+          .updateOne({"_id":pubg.autor,"publicaciones._id":pubg._id}, {
+            $set: {
+                "publicaciones.$.publicacion": publicacion,
+            }
+          })
       await publicationSchema
-      .updateOne({ _id: id }, { $set: { publicacion } })
-      .then((data) => res.json(data))
-      .catch((error) => res.json({ message: error }));
+        .updateOne({ _id: id }, { $set: { publicacion } })
+        .then((data) => res.json(data))
+        .catch((error) => res.json({ message: error }));
     }
   }
- 
+
 });
 
 module.exports = router
